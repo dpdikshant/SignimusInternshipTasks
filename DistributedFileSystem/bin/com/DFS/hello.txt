@@ -1,0 +1,4 @@
+Hello, Distributed File System!
+This is a test file to demonstrate storing and retrieving data chunks.
+Each line here will be chunked and distributed across DataNodes.
+End of file example.
