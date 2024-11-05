@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Home Dashboard</title>
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h2>Smart Home</h2>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#lighting"><img src="icons/lightbulb.png" alt="Lighting"> Lighting</a></li>
+                    <li><a href="#thermostat"><img src="icons/thermostat.png" alt="Thermostat"> Thermostat</a></li>
+                    <li><a href="#security"><img src="icons/security.png" alt="Security"> Security</a></li>
+                    <li><a href="#door-locks"><img src="icons/door-lock.png" alt="Door Locks"> Door Locks</a></li>
+                    <li><a href="#appliances"><img src="icons/appliance.png" alt="Appliances"> Appliances</a></li>
+                    <li><a href="#scenarios"><img src="icons/scenario.png" alt="Scenarios"> Scenarios</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header>
+                <h1>Welcome to Your Smart Home</h1>
+                <p>Monitor and control all your devices from one place.</p>
+            </header>
+
+            <section id="lighting" class="widget">
+                <h2>Lighting Control</h2>
+                <button onclick="controlDevice('/api/devices/light/on', 'lighting-status', 'On')">Turn On</button>
+                <button onclick="controlDevice('/api/devices/light/off', 'lighting-status', 'Off')">Turn Off</button>
+                <p>Status: <span id="lighting-status">Off</span></p>
+            </section>
+
+            <section id="thermostat" class="widget">
+                <h2>Thermostat</h2>
+                <input type="range" min="60" max="80" value="72" class="slider" id="thermostat-slider" oninput="updateThermostatDisplay(this.value)">
+                <p>Temperature: <span id="thermostat-value">72°F</span></p>
+                <button onclick="setTemperature()">Set Temperature</button>
+            </section>
+
+            <section id="security" class="widget">
+                <h2>Security Cameras</h2>
+                <button onclick="controlDevice('/api/devices/security/activate', 'security-status', 'Active')">Activate</button>
+                <button onclick="controlDevice('/api/devices/security/deactivate', 'security-status', 'Inactive')">Deactivate</button>
+                <p>Status: <span id="security-status">Inactive</span></p>
+            </section>
+
+            <section id="door-locks" class="widget">
+                <h2>Door Locks</h2>
+                <button onclick="controlDevice('/api/devices/door/lock', 'door-locks-status', 'Locked')">Lock All</button>
+                <button onclick="controlDevice('/api/devices/door/unlock', 'door-locks-status', 'Unlocked')">Unlock All</button>
+                <p>Status: <span id="door-locks-status">Locked</span></p>
+            </section>
+
+            <section id="appliances" class="widget">
+                <h2>Appliance Control</h2>
+                <button onclick="controlDevice('/api/devices/appliances/on', 'appliances-status', 'On')">Turn On All</button>
+                <button onclick="controlDevice('/api/devices/appliances/off', 'appliances-status', 'Off')">Turn Off All</button>
+                <p>Status: <span id="appliances-status">Off</span></p>
+            </section>
+
+            <section id="scenarios" class="widget">
+                <h2>Automation Scenarios</h2>
+                <button onclick="controlDevice('/api/scenarios/good-morning', null, null)">Good Morning</button>
+                <button onclick="controlDevice('/api/scenarios/leaving-home', null, null)">Leaving Home</button>
+                <button onclick="controlDevice('/api/scenarios/good-night', null, null)">Good Night</button>
+            </section>
+        </main>
+    </div>
+
+    <!-- Device Control Panel -->
+    <div class="control-panel">
+        <div class="device">
+            <h3>Light Control</h3>
+            <button onclick="controlDevice('/api/devices/light/on', 'lighting-status', 'On')">Turn On</button>
+            <button onclick="controlDevice('/api/devices/light/off', 'lighting-status', 'Off')">Turn Off</button>
+        </div>
+        <div class="device">
+            <h3>Thermostat</h3>
+            <input type="number" id="tempInput" placeholder="Enter Temp" />
+            <button onclick="setTemperature()">Set Temperature</button>
+        </div>
+        <div class="device">
+            <h3>Door Lock</h3>
+            <button onclick="controlDevice('/api/devices/door/lock', 'door-locks-status', 'Locked')">Lock</button>
+            <button onclick="controlDevice('/api/devices/door/unlock', 'door-locks-status', 'Unlocked')">Unlock</button>
+        </div>
+    </div>
+
+    <!-- JavaScript Code -->
+    <script>
+        function controlDevice(url, statusElementId, statusValue) {
+            fetch(url, { method: 'POST' })
+                .then(response => {
+                    if (response.ok) {
+                        if (statusElementId && statusValue) {
+                            document.getElementById(statusElementId).textContent = statusValue;
+                        }
+                        alert('Action successful');
+                    } else {
+                        throw new Error('Failed to control device');
+                    }
+                })
+                .catch(error => alert('Error: ' + error.message));
+        }
+
+        function setTemperature() {
+            const temp = document.getElementById("tempInput").value || document.getElementById("thermostat-slider").value;
+            if (temp) {
+                controlDevice(`/api/devices/thermostat/${temp}`, 'thermostat-value', `${temp}°F`);
+            }
+        }
+
+        function updateThermostatDisplay(value) {
+            document.getElementById("thermostat-value").textContent = `${value}°F`;
+        }
+    </script>
+</body>
+</html>
